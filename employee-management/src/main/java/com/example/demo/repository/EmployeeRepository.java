@@ -1,0 +1,22 @@
+package com.example.demo.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.model.Employee;
+
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+	 // Custom query using JPQL
+    @Query("SELECT e FROM Employee e WHERE e.department = :dept")
+    List<Employee> findByDepartment(@Param("dept") String department);
+    
+    List<Employee> findBySalaryGreaterThan(double salary);
+    
+    List<Employee> findBySalaryBetween(double min,double max);
+    
+    @Query("SELECT e FROM Employee e where salary= :salary and name= :name")
+    List<Employee> findBySalaryAndName(@Param("salary") double salary,@Param("name") String name);
+}
