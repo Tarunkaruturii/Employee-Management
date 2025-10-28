@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.model.Employee;
 import com.example.demo.repository.EmployeeRepository;
 
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+    
+    @Autowired
+    private ModelMapper modelMapper;
 
     // ✅ Create or Update Employee
     public Employee saveEmployee(Employee employee) {
@@ -61,5 +66,21 @@ public class EmployeeService {
     
     public List<Employee> getEmployeeByNameAndSalary(double salary,String name) {
     	return employeeRepository.findBySalaryAndName(salary, name);
+    }
+    
+    public Page<Employee> getEmployeesPaginatedd(int page, int size, String sortBy) {
+    	return employeeRepository.findAll(PageRequest.of(page, size,Sort.by(sortBy)));
+    }
+    
+    public EmployeeDTO convertToDTO(Employee employee) {
+    	modelMapper.typeMap(Employee.class, EmployeeDTO.class).addMappings(mapper -> {
+    	    mapper.map(src -> "DEPT-" + src.getDepartment().toUpperCase(), EmployeeDTO::setDepartmentCode);
+    	});
+
+    	return modelMapper.map(employee, EmployeeDTO.class);
+    }
+    
+    public Employee convertToEntity(EmployeeDTO employeeDTO) {
+    	return modelMapper.map(employeeDTO, Employee.class);
     }
 }

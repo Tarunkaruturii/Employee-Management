@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.model.Employee;
 import com.example.demo.service.EmployeeService;
 
@@ -92,4 +93,27 @@ public class EmployeeController {
     public List<Employee> getEmployeeBySalaryAndName(@RequestParam  double salary,@RequestParam String name) {
     	return employeeService.getEmployeeByNameAndSalary(salary, name);
     }
+    
+    @GetMapping("getEmployeesPaginatedd")
+    public Page<Employee> getEmployeesPaginatedd(@RequestParam int page, @RequestParam int size,@RequestParam String sortBy) {
+    	return employeeService.getEmployeesPaginatedd(page, size, sortBy);
+    }
+    
+    @GetMapping("/getEployeeByDTO/{id}")
+    public EmployeeDTO getEmployeeDTO(@PathVariable Long id) {
+    	Employee employee=employeeService.getEmployeeById(id).orElseThrow();
+    	EmployeeDTO employeeDTO= new EmployeeDTO();
+    	employeeDTO.setId(employee.getId());
+    	employeeDTO.setName(employee.getName());
+    	employeeDTO.setDepartment(employee.getDepartment());
+    	employeeDTO.setDepartmentCode(employee.getDepartment().toUpperCase());
+    	return employeeDTO;
+    }
+    
+    @GetMapping("/mapper/{id}")
+    public EmployeeDTO getEmployeeViaMapper(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeById(id).orElseThrow();
+        return employeeService.convertToDTO(employee);
+    }
+
 }
